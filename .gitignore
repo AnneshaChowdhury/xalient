@@ -1,0 +1,8 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+xreach.db
+xreach.db-*
+chrome_profile/
+.DS_Store

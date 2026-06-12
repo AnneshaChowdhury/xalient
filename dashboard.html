@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>XReach</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101214;
+      --panel: #181c20;
+      --panel-2: #20262c;
+      --text: #eef2f5;
+      --muted: #9aa7b3;
+      --line: #303841;
+      --accent: #36c28a;
+      --danger: #ff6b6b;
+      --focus: #6bb8ff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 24px;
+      background: rgba(16, 18, 20, 0.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .stat {
+      min-width: 104px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 8px;
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 2px;
+      font-size: 15px;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 24px auto;
+    }
+
+    #feed {
+      display: grid;
+      gap: 16px;
+    }
+
+    .empty {
+      padding: 48px 24px;
+      color: var(--muted);
+      text-align: center;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      overflow: hidden;
+      animation: fadeIn 220ms ease-out;
+    }
+
+    .card.new {
+      animation: flashIn 1400ms ease-out;
+    }
+
+    .tweet {
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tweet-text {
+      margin: 0 0 14px;
+      white-space: pre-wrap;
+      line-height: 1.45;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .meta a {
+      color: var(--focus);
+      text-decoration: none;
+    }
+
+    .drafts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      padding: 18px;
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 132px;
+      resize: vertical;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      line-height: 1.4;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: var(--focus);
+      box-shadow: 0 0 0 2px rgba(107, 184, 255, 0.18);
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 0 18px 18px;
+    }
+
+    button {
+      min-width: 92px;
+      min-height: 40px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      color: #07120d;
+      background: var(--accent);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      color: var(--text);
+      background: transparent;
+      border-color: var(--line);
+    }
+
+    button:hover { filter: brightness(1.08); }
+    button:disabled { cursor: not-allowed; opacity: 0.55; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes flashIn {
+      0% { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(54, 194, 138, 0.24); }
+      100% { border-color: var(--line); box-shadow: none; }
+    }
+
+    @media (max-width: 760px) {
+      header { align-items: flex-start; flex-direction: column; }
+      .stats { justify-content: flex-start; }
+      .stat { min-width: calc(50% - 4px); }
+      .drafts { grid-template-columns: 1fr; }
+      .actions { justify-content: stretch; }
+      button { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>XReach</h1>
+    <section class="stats" aria-label="Live stats">
+      <div class="stat"><span>Posts</span><strong id="totalPosts">0</strong></div>
+      <div class="stat"><span>Pending</span><strong id="pendingDrafts">0</strong></div>
+      <div class="stat"><span>Approved</span><strong id="approvedDrafts">0</strong></div>
+      <div class="stat"><span>Skipped</span><strong id="skippedDrafts">0</strong></div>
+      <div class="stat"><span>Last poll</span><strong id="lastPoll">Waiting</strong></div>
+    </section>
+  </header>
+
+  <main>
+    <section id="feed" aria-live="polite"></section>
+  </main>
+
+  <script>
+    const feed = document.querySelector("#feed");
+    const seenDrafts = new Set();
+
+    function formatDate(value) {
+      if (!value) return "Unknown";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return date.toLocaleString();
+    }
+
+    function followerLabel(count) {
+      const value = Number(count || 0);
+      return new Intl.NumberFormat().format(value) + " followers";
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[char]));
+    }
+
+    async function postAction(id, action) {
+      const card = document.querySelector(`[data-id="${id}"]`);
+      const reply = card.querySelector(".reply").value;
+      const dm = card.querySelector(".dm").value;
+      card.querySelectorAll("button").forEach((button) => button.disabled = true);
+
+      await fetch(`/drafts/${id}/${action}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reply_draft: reply, dm_draft: dm })
+      });
+      await refresh();
+    }
+
+    function renderDrafts(drafts) {
+      if (!drafts.length) {
+        feed.innerHTML = `<div class="empty">No pending drafts yet.</div>`;
+        return;
+      }
+
+      feed.innerHTML = drafts.map((draft) => {
+        const isNew = !seenDrafts.has(draft.id);
+        seenDrafts.add(draft.id);
+        return `
+          <article class="card ${isNew ? "new" : ""}" data-id="${draft.id}">
+            <div class="tweet">
+              <p class="tweet-text">${escapeHtml(draft.tweet_text)}</p>
+              <div class="meta">
+                <strong>${escapeHtml(draft.author_name || "Unknown")}</strong>
+                <span>${escapeHtml(draft.author_handle || "")}</span>
+                <span>${followerLabel(draft.follower_count)}</span>
+                <span>${formatDate(draft.timestamp)}</span>
+                <span>${Math.round(Number(draft.confidence || 0) * 100)}% confidence</span>
+                <a href="${escapeHtml(draft.tweet_url)}" target="_blank" rel="noopener noreferrer">Open tweet</a>
+              </div>
+            </div>
+            <div class="drafts">
+              <label>
+                Reply draft
+                <textarea class="reply" maxlength="280">${escapeHtml(draft.reply_draft)}</textarea>
+              </label>
+              <label>
+                DM draft
+                <textarea class="dm">${escapeHtml(draft.dm_draft)}</textarea>
+              </label>
+            </div>
+            <div class="actions">
+              <button class="secondary" onclick="postAction(${draft.id}, 'skip')">Skip</button>
+              <button onclick="postAction(${draft.id}, 'approve')">Approve</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    async function refreshStats() {
+      const response = await fetch("/stats");
+      const stats = await response.json();
+      document.querySelector("#totalPosts").textContent = stats.total_posts_scraped;
+      document.querySelector("#pendingDrafts").textContent = stats.pending_drafts;
+      document.querySelector("#approvedDrafts").textContent = stats.approved;
+      document.querySelector("#skippedDrafts").textContent = stats.skipped;
+      document.querySelector("#lastPoll").textContent = stats.last_poll_time
+        ? formatDate(stats.last_poll_time)
+        : "Waiting";
+    }
+
+    async function refresh() {
+      try {
+        const [draftResponse] = await Promise.all([
+          fetch("/drafts"),
+          refreshStats()
+        ]);
+        renderDrafts(await draftResponse.json());
+      } catch (error) {
+        console.error("Refresh failed", error);
+      }
+    }
+
+    refresh();
+    setInterval(refresh, 30000);
+  </script>
+</body>
+</html>
