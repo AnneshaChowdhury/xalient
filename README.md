@@ -1,6 +1,6 @@
-# XReach
+# Xalient
 
-XReach is a self-hosted tool for finding hiring posts on X, filtering them with a
+Xalient is a self-hosted tool for finding hiring posts on X, filtering them with a
 local Ollama model, and drafting human-reviewed outreach. It uses no paid APIs and
 does not auto-send messages.
 

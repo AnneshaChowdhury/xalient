@@ -10,7 +10,7 @@ import scraper
 from database import db_connection, init_db
 
 
-app = FastAPI(title="XReach")
+app = FastAPI(title="Xalient")
 
 
 class DraftUpdate(BaseModel):
